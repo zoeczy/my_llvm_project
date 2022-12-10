@@ -1,0 +1,20 @@
+digraph "Call graph: for_sum.ll" {
+	label="Call graph: for_sum.ll";
+
+	Node0x56440c15d120 [shape=record,label="{__cxx_global_var_init}"];
+	Node0x56440c15d120 -> Node0x56440c1526e0;
+	Node0x56440c15d120 -> Node0x56440c152790;
+	Node0x56440c1526e0 [shape=record,label="{_ZNSt8ios_base4InitC1Ev}"];
+	Node0x56440c152840 [shape=record,label="{_ZNSt8ios_base4InitD1Ev}"];
+	Node0x56440c152790 [shape=record,label="{__cxa_atexit}"];
+	Node0x56440c164e90 [shape=record,label="{main}"];
+	Node0x56440c164e90 -> Node0x56440c164f10;
+	Node0x56440c164e90 -> Node0x56440c164fc0;
+	Node0x56440c164e90 -> Node0x56440c165040;
+	Node0x56440c164f10 [shape=record,label="{_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc}"];
+	Node0x56440c164fc0 [shape=record,label="{_ZNSolsEi}"];
+	Node0x56440c165040 [shape=record,label="{_ZNSolsEPFRSoS_E}"];
+	Node0x56440c165320 [shape=record,label="{_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_}"];
+	Node0x56440c1653d0 [shape=record,label="{_GLOBAL__sub_I_for_sum.cpp}"];
+	Node0x56440c1653d0 -> Node0x56440c15d120;
+}

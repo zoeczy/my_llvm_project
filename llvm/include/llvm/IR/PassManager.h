@@ -498,12 +498,15 @@ public:
   PreservedAnalyses run(IRUnitT &IR, AnalysisManagerT &AM,
                         ExtraArgTs... ExtraArgs) {
     PreservedAnalyses PA = PreservedAnalyses::all();
+    // PreservedAnalysis用来描述分析结果有效性，不修改ir的话就是all()表征ayalysis results r consistent
+    // PassBuilder被用于build Passmanager的pipeline，我们会将我们定义的pass插入流水
+    // 区别于旧版passmanager，analysis pass和transform pass分离，这样获取分析数据不需要专门的方法只需要作为返回值返回即可
 
     // Request PassInstrumentation from analysis manager, will use it to run
     // instrumenting callbacks for the passes later.
     // Here we use std::tuple wrapper over getResult which helps to extract
     // AnalysisManager's arguments out of the whole ExtraArgs set.
-    PassInstrumentation PI =
+    PassInstrumentation PI =  
         detail::getAnalysisResult<PassInstrumentationAnalysis>(
             AM, IR, std::tuple<ExtraArgTs...>(ExtraArgs...));
 
@@ -522,6 +525,7 @@ public:
 
       // Call onto PassInstrumentation's AfterPass callbacks immediately after
       // running the pass.
+      // 当前pass运行之后的处理
       PI.runAfterPass<IRUnitT>(*Pass, IR, PassPA);
 
       // Update the analysis manager as each pass runs and potentially

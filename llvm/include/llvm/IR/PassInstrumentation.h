@@ -212,7 +212,7 @@ public:
   /// and constant reference to IR it operates on. \Returns true if pass is
   /// allowed to be executed. These are only run on optional pass since required
   /// passes must always be run. This allows these callbacks to print info when
-  /// they want to skip a pass.
+  /// they want to skip a pass.很多pass不需要检查callback就可以执行
   template <typename IRUnitT, typename PassT>
   bool runBeforePass(const PassT &Pass, const IRUnitT &IR) const {
     if (!Callbacks)

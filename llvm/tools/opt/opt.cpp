@@ -478,6 +478,7 @@ static bool shouldForceLegacyPM() {
 //===----------------------------------------------------------------------===//
 // main for opt
 //
+
 int main(int argc, char **argv) {
   InitLLVM X(argc, argv);
 

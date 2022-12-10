@@ -371,7 +371,7 @@ public:
     // this code outside of a pass manager.
     // FIXME: It's really gross that we have to cast away constness here.
     if (!F.empty())
-      DT.recalculate(const_cast<Function &>(F));
+      DT.recalculate(const_cast<Function &>(F));//计算支配树，不放在passmanager是因为可能支配树信息out of date
 
     for (const BasicBlock &BB : F) {
       if (!BB.empty() && BB.back().isTerminator())

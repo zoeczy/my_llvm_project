@@ -428,6 +428,8 @@ bool LoopInvariantCodeMotion::runOnLoop(
   // that we are guaranteed to see definitions before we see uses.  This allows
   // us to sink instructions in one pass, without iteration.  After sinking
   // instructions, we perform another pass to hoist them out of the loop.
+
+  // 找到loop invariants：沿着支配树遍历，保证先遇到def后遇到use。先sink指令，后把他们hoist。
   if (L->hasDedicatedExits())
     Changed |=
         LoopNestMode
@@ -448,6 +450,7 @@ bool LoopInvariantCodeMotion::runOnLoop(
   // make sure we catch that. An additional load may be generated in the
   // preheader for SSA updater, so also avoid sinking when no preheader
   // is available.
+  // 这里进行完所有的licm了，需要promote mem reference，先判断是否有唯一exit block从而可以sink
   if (!DisablePromotion && Preheader && L->hasDedicatedExits() &&
       !Flags.tooManyMemoryAccesses() && !HasCoroSuspendInst) {
     // Figure out the loop exits and their insertion points
@@ -538,13 +541,13 @@ bool llvm::sinkRegion(DomTreeNode *N, AAResults *AA, LoopInfo *LI,
 
   bool Changed = false;
   for (DomTreeNode *DTN : reverse(Worklist)) {
-    BasicBlock *BB = DTN->getBlock();
+    BasicBlock *BB = DTN->getBlock();//inc-body3
     // Only need to process the contents of this block if it is not part of a
     // subloop (which would already have been processed).
     if (inSubLoop(BB, CurLoop, LI))
       continue;
 
-    for (BasicBlock::iterator II = BB->end(); II != BB->begin();) {
+    for (BasicBlock::iterator II = BB->end(); II != BB->begin();) {//从该基本块的最后一条指令开始遍历
       Instruction &I = *--II;
 
       // The instruction is not used in the loop if it is dead.  In this case,
@@ -563,7 +566,7 @@ bool llvm::sinkRegion(DomTreeNode *N, AAResults *AA, LoopInfo *LI,
       // of the loop.  We can do this if the all users of the instruction are
       // outside of the loop.  In this case, it doesn't even matter if the
       // operands of the instruction are loop invariant.
-      //
+      // 无论是否循环不变，如果该指令的所有user都在loop-exit外，则sink
       bool FreeInLoop = false;
       bool LoopNestMode = OutermostLoop != nullptr;
       if (!I.mayHaveSideEffects() &&
@@ -1897,6 +1900,7 @@ bool isNotVisibleOnUnwindInLoop(const Value *Object, const Loop *L,
 /// the stores in the loop, looking for stores to Must pointers which are
 /// loop invariant.
 ///
+// store指令的下沉 && load指令的提升 
 bool llvm::promoteLoopAccessesToScalars(
     const SmallSetVector<Value *, 8> &PointerMustAliases,
     SmallVectorImpl<BasicBlock *> &ExitBlocks,

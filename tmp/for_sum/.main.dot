@@ -1,0 +1,14 @@
+digraph "CFG for 'main' function" {
+	label="CFG for 'main' function";
+
+	Node0x5556ab1fcfb0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#b9d0f970",label="{entry:\l  %retval = alloca i32, align 4\l  %argc.addr = alloca i32, align 4\l  %argv.addr = alloca ptr, align 8\l  %i = alloca i32, align 4\l  store i32 0, ptr %retval, align 4\l  store i32 %argc, ptr %argc.addr, align 4\l  store ptr %argv, ptr %argv.addr, align 8\l  store i32 0, ptr %i, align 4\l  store i32 0, ptr %i, align 4\l  br label %for.cond\l}"];
+	Node0x5556ab1fcfb0 -> Node0x5556ab1fd540;
+	Node0x5556ab1fd540 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870",label="{for.cond:                                         \l  %0 = load i32, ptr %i, align 4\l  %cmp = icmp slt i32 %0, 101\l  br i1 %cmp, label %for.body, label %for.end\l|{<s0>T|<s1>F}}"];
+	Node0x5556ab1fd540:s0 -> Node0x5556ab1fd7a0;
+	Node0x5556ab1fd540:s1 -> Node0x5556ab1fd820;
+	Node0x5556ab1fd7a0 [shape=record,color="#b70d28ff", style=filled, fillcolor="#bb1b2c70",label="{for.body:                                         \l  %1 = load i32, ptr %i, align 4\l  %2 = load i32, ptr @sum, align 4\l  %add = add nsw i32 %2, %1\l  store i32 %add, ptr @sum, align 4\l  br label %for.inc\l}"];
+	Node0x5556ab1fd7a0 -> Node0x5556ab1fdb90;
+	Node0x5556ab1fdb90 [shape=record,color="#b70d28ff", style=filled, fillcolor="#bb1b2c70",label="{for.inc:                                          \l  %3 = load i32, ptr %i, align 4\l  %inc = add nsw i32 %3, 1\l  store i32 %inc, ptr %i, align 4\l  br label %for.cond, !llvm.loop !6\l}"];
+	Node0x5556ab1fdb90 -> Node0x5556ab1fd540;
+	Node0x5556ab1fd820 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#b9d0f970",label="{for.end:                                          \l  %call = call noundef nonnull align 8 dereferenceable(8) ptr\l... @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull\l... align 8 dereferenceable(8) @_ZSt4cout, ptr noundef @.str)\l  %4 = load i32, ptr @sum, align 4\l  %call1 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEi(ptr\l... noundef nonnull align 8 dereferenceable(8) %call, i32 noundef %4)\l  %call2 = call noundef nonnull align 8 dereferenceable(8) ptr\l... @_ZNSolsEPFRSoS_E(ptr noundef nonnull align 8 dereferenceable(8) %call1, ptr\l... noundef @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)\l  ret i32 0\l}"];
+}

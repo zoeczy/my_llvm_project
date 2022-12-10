@@ -1,0 +1,23 @@
+digraph "CFG for 'main' function" {
+	label="CFG for 'main' function";
+
+	Node0x564fa3d3b730 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#88abfd70",label="{entry:\l  %retval = alloca i32, align 4\l  %argc.addr = alloca i32, align 4\l  %argv.addr = alloca ptr, align 8\l  %i = alloca i32, align 4\l  %look = alloca i32, align 4\l  %j = alloca i32, align 4\l  store i32 0, ptr %retval, align 4\l  store i32 %argc, ptr %argc.addr, align 4\l  store ptr %argv, ptr %argv.addr, align 8\l  store i32 0, ptr %i, align 4\l  store i32 0, ptr %look, align 4\l  store i32 0, ptr %i, align 4\l  %i.promoted = load i32, ptr %i, align 4\l  %sum.promoted = load i32, ptr @sum, align 4\l  %j.promoted6 = load i32, ptr %j, align 4\l  %look.promoted8 = load i32, ptr %look, align 1\l  br label %for.cond\l}"];
+	Node0x564fa3d3b730 -> Node0x564fa3d3c290;
+	Node0x564fa3d3c290 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#f3c7b170",label="{for.cond:                                         \l  %add42.lcssa9 = phi i32 [ %add42.lcssa, %for.inc5 ], [ %look.promoted8,\l... %entry ]\l  %inc1.lcssa7 = phi i32 [ %inc1.lcssa, %for.inc5 ], [ %j.promoted6, %entry ]\l  %add5 = phi i32 [ %add, %for.inc5 ], [ %sum.promoted, %entry ]\l  %inc63 = phi i32 [ %inc6, %for.inc5 ], [ %i.promoted, %entry ]\l  %cmp = icmp slt i32 %inc63, 101\l  br i1 %cmp, label %for.body, label %for.end7\l|{<s0>T|<s1>F}}"];
+	Node0x564fa3d3c290:s0 -> Node0x564fa3d3cac0;
+	Node0x564fa3d3c290:s1 -> Node0x564fa3d3cba0;
+	Node0x564fa3d3cac0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#f3c7b170",label="{for.body:                                         \l  %add = add nsw i32 %add5, %inc63\l  store i32 %add, ptr @sum, align 4\l  br label %for.cond1\l}"];
+	Node0x564fa3d3cac0 -> Node0x564fa3d3ce50;
+	Node0x564fa3d3ce50 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870",label="{for.cond1:                                        \l  %add42 = phi i32 [ %add4, %for.inc ], [ %add42.lcssa9, %for.body ]\l  %inc1 = phi i32 [ %inc, %for.inc ], [ 0, %for.body ]\l  %cmp2 = icmp slt i32 %inc1, 10\l  br i1 %cmp2, label %for.body3, label %for.end\l|{<s0>T|<s1>F}}"];
+	Node0x564fa3d3ce50:s0 -> Node0x564fa3d3d620;
+	Node0x564fa3d3ce50:s1 -> Node0x564fa3d3d700;
+	Node0x564fa3d3d620 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870",label="{for.body3:                                        \l  store i32 5, ptr @invariant, align 4\l  %add4 = add nsw i32 5, %inc1\l  br label %for.inc\l}"];
+	Node0x564fa3d3d620 -> Node0x564fa3d3cf60;
+	Node0x564fa3d3cf60 [shape=record,color="#b70d28ff", style=filled, fillcolor="#b70d2870",label="{for.inc:                                          \l  %inc = add nsw i32 %inc1, 1\l  br label %for.cond1, !llvm.loop !6\l}"];
+	Node0x564fa3d3cf60 -> Node0x564fa3d3ce50;
+	Node0x564fa3d3d700 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#f3c7b170",label="{for.end:                                          \l  %add42.lcssa = phi i32 [ %add42, %for.cond1 ]\l  %inc1.lcssa = phi i32 [ %inc1, %for.cond1 ]\l  br label %for.inc5\l}"];
+	Node0x564fa3d3d700 -> Node0x564fa3d3c3e0;
+	Node0x564fa3d3c3e0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#f3c7b170",label="{for.inc5:                                         \l  %inc6 = add nsw i32 %inc63, 1\l  br label %for.cond, !llvm.loop !8\l}"];
+	Node0x564fa3d3c3e0 -> Node0x564fa3d3c290;
+	Node0x564fa3d3cba0 [shape=record,color="#3d50c3ff", style=filled, fillcolor="#88abfd70",label="{for.end7:                                         \l  %add42.lcssa9.lcssa = phi i32 [ %add42.lcssa9, %for.cond ]\l  %inc1.lcssa7.lcssa = phi i32 [ %inc1.lcssa7, %for.cond ]\l  %inc63.lcssa = phi i32 [ %inc63, %for.cond ]\l  store i32 %inc63.lcssa, ptr %i, align 4\l  store i32 %inc1.lcssa7.lcssa, ptr %j, align 4\l  store i32 %add42.lcssa9.lcssa, ptr %look, align 1\l  %call = call noundef nonnull align 8 dereferenceable(8) ptr\l... @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull\l... align 8 dereferenceable(8) @_ZSt4cout, ptr noundef @.str)\l  %0 = load i32, ptr @sum, align 4\l  %call8 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEi(ptr\l... noundef nonnull align 8 dereferenceable(8) %call, i32 noundef %0)\l  %call9 = call noundef nonnull align 8 dereferenceable(8) ptr\l... @_ZNSolsEPFRSoS_E(ptr noundef nonnull align 8 dereferenceable(8) %call8, ptr\l... noundef @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)\l  ret i32 0\l}"];
+}

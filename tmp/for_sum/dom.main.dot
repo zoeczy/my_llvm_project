@@ -1,0 +1,13 @@
+digraph "Dominator tree for 'main' function" {
+	label="Dominator tree for 'main' function";
+
+	Node0x55bd5d4c8640 [shape=record,label="{entry:\l  %retval = alloca i32, align 4\l  %argc.addr = alloca i32, align 4\l  %argv.addr = alloca ptr, align 8\l  %i = alloca i32, align 4\l  store i32 0, ptr %retval, align 4\l  store i32 %argc, ptr %argc.addr, align 4\l  store ptr %argv, ptr %argv.addr, align 8\l  store i32 0, ptr %i, align 4\l  store i32 0, ptr %i, align 4\l  br label %for.cond\l}"];
+	Node0x55bd5d4c8640 -> Node0x55bd5d4c86a0;
+	Node0x55bd5d4c86a0 [shape=record,label="{for.cond:                                         \l  %0 = load i32, ptr %i, align 4\l  %cmp = icmp slt i32 %0, 101\l  br i1 %cmp, label %for.body, label %for.end\l}"];
+	Node0x55bd5d4c86a0 -> Node0x55bd5d4c8700;
+	Node0x55bd5d4c86a0 -> Node0x55bd5d4c87c0;
+	Node0x55bd5d4c8700 [shape=record,label="{for.body:                                         \l  %1 = load i32, ptr %i, align 4\l  %2 = load i32, ptr @sum, align 4\l  %add = add nsw i32 %2, %1\l  store i32 %add, ptr @sum, align 4\l  br label %for.inc\l}"];
+	Node0x55bd5d4c8700 -> Node0x55bd5d4c8760;
+	Node0x55bd5d4c8760 [shape=record,label="{for.inc:                                          \l  %3 = load i32, ptr %i, align 4\l  %inc = add nsw i32 %3, 1\l  store i32 %inc, ptr %i, align 4\l  br label %for.cond, !llvm.loop !6\l}"];
+	Node0x55bd5d4c87c0 [shape=record,label="{for.end:                                          \l  %call = call noundef nonnull align 8 dereferenceable(8) ptr\l... @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull\l... align 8 dereferenceable(8) @_ZSt4cout, ptr noundef @.str)\l  %4 = load i32, ptr @sum, align 4\l  %call1 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEi(ptr\l... noundef nonnull align 8 dereferenceable(8) %call, i32 noundef %4)\l  %call2 = call noundef nonnull align 8 dereferenceable(8) ptr\l... @_ZNSolsEPFRSoS_E(ptr noundef nonnull align 8 dereferenceable(8) %call1, ptr\l... noundef @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)\l  ret i32 0\l}"];
+}

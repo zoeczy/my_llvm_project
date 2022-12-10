@@ -428,25 +428,25 @@ static void discoverAndMapSubloop(LoopT *L, ArrayRef<BlockT *> Backedges,
 
   // Perform a backward CFG traversal using a worklist.
   std::vector<BlockT *> ReverseCFGWorklist(Backedges.begin(), Backedges.end());
-  while (!ReverseCFGWorklist.empty()) {
-    BlockT *PredBB = ReverseCFGWorklist.back();
+  while (!ReverseCFGWorklist.empty()) { //backage按照后序push back，所以第一个是最内层循环
+    BlockT *PredBB = ReverseCFGWorklist.back(); 
     ReverseCFGWorklist.pop_back();
 
-    LoopT *Subloop = LI->getLoopFor(PredBB);
-    if (!Subloop) {
+    LoopT *Subloop = LI->getLoopFor(PredBB); //第一次跑loopanalysis时BBMap是空的，没有basicblock到loop的映射
+    if (!Subloop) {//当前结点的循环Subloop，如果没找到loop，则将其前继加入worklist中
       if (!DomTree.isReachableFromEntry(PredBB))
         continue;
 
       // This is an undiscovered block. Map it to the current loop.
-      LI->changeLoopFor(PredBB, L);
+      LI->changeLoopFor(PredBB, L);//将这个结点加入当前循环
       ++NumBlocks;
       if (PredBB == L->getHeader())
         continue;
-      // Push all block predecessors on the worklist.
+      // Push all block predecessors on the worklist.将所有前继加入worklist中
       ReverseCFGWorklist.insert(ReverseCFGWorklist.end(),
                                 InvBlockTraits::child_begin(PredBB),
                                 InvBlockTraits::child_end(PredBB));
-    } else {
+    } else {//处理嵌套循环(我们向上遍历node时遇到了子循环的结点，它已经有自己的loop属性了)
       // This is a discovered block. Find its outermost discovered loop.
       Subloop = Subloop->getOutermostLoop();
 
@@ -455,7 +455,7 @@ static void discoverAndMapSubloop(LoopT *L, ArrayRef<BlockT *> Backedges,
         continue;
 
       // Discover a subloop of this loop.
-      Subloop->setParentLoop(L);
+      Subloop->setParentLoop(L);//我们在找到了目前想要的loop-header时，创建了针对该循环的loop结构
       ++NumSubloops;
       NumBlocks += Subloop->getBlocksVector().capacity();
       PredBB = Subloop->getHeader();
@@ -463,8 +463,8 @@ static void discoverAndMapSubloop(LoopT *L, ArrayRef<BlockT *> Backedges,
       // within this subloop tree itself. Note that a predecessor may directly
       // reach another subloop that is not yet discovered to be a subloop of
       // this loop, which we must traverse.
-      for (const auto Pred : children<Inverse<BlockT *>>(PredBB)) {
-        if (LI->getLoopFor(Pred) != Subloop)
+      for (const auto Pred : children<Inverse<BlockT *>>(PredBB)) {//将子循环头结点的前继加入到worklist中
+        if (LI->getLoopFor(Pred) != Subloop) //子循环头结点的前继包括(子循环的inc)和(父循环中子循环的入口)
           ReverseCFGWorklist.push_back(Pred);
       }
     }
@@ -502,9 +502,9 @@ void PopulateLoopsDFS<BlockT, LoopT>::traverse(BlockT *EntryBlock) {
 template <class BlockT, class LoopT>
 void PopulateLoopsDFS<BlockT, LoopT>::insertIntoLoop(BlockT *Block) {
   LoopT *Subloop = LI->getLoopFor(Block);
-  if (Subloop && Block == Subloop->getHeader()) {
+  if (Subloop && Block == Subloop->getHeader()) {// 如果当前结点是循环头节点，则设置循环嵌套关系
     // We reach this point once per subloop after processing all the blocks in
-    // the subloop.
+    // the subloop.当subloop的所有block都处理完，就会到Header。
     if (!Subloop->isOutermost())
       Subloop->getParentLoop()->getSubLoopsVector().push_back(Subloop);
     else
@@ -518,7 +518,7 @@ void PopulateLoopsDFS<BlockT, LoopT>::insertIntoLoop(BlockT *Block) {
 
     Subloop = Subloop->getParentLoop();
   }
-  for (; Subloop; Subloop = Subloop->getParentLoop())
+  for (; Subloop; Subloop = Subloop->getParentLoop())// 在每个父循环中加入当前basicblock
     Subloop->addBlockEntry(Block);
 }
 
@@ -541,11 +541,12 @@ void LoopInfoBase<BlockT, LoopT>::analyze(const DomTreeBase<BlockT> &DomTree) {
   // Postorder traversal of the dominator tree.
   const DomTreeNodeBase<BlockT> *DomRoot = DomTree.getRootNode();
   for (auto DomNode : post_order(DomRoot)) {
-
+    //分析算法会按dom-tree的后序序列进行遍历，这样可以先找到最内层的循环。
     BlockT *Header = DomNode->getBlock();
     SmallVector<BlockT *, 4> Backedges;
 
     // Check each predecessor of the potential loop header.
+    // 如果一个结点支配其前继，则将这个边识别为backedge(用这条边做循环)
     for (const auto Backedge : children<Inverse<BlockT *>>(Header)) {
       // If Header dominates predBB, this is a new loop. Collect the backedges.
       if (DomTree.dominates(Header, Backedge) &&
@@ -554,14 +555,15 @@ void LoopInfoBase<BlockT, LoopT>::analyze(const DomTreeBase<BlockT> &DomTree) {
       }
     }
     // Perform a backward CFG traversal to discover and map blocks in this loop.
+    // 一旦找到这样一对block后，就可以从这个前继block开始沿着reverse cfg来找到循环体中的所有结点。
     if (!Backedges.empty()) {
-      LoopT *L = AllocateLoop(Header);
-      discoverAndMapSubloop(L, ArrayRef<BlockT *>(Backedges), this, DomTree);
+      LoopT *L = AllocateLoop(Header); // 初始化一个loop，以backedge的端点为loop header
+      discoverAndMapSubloop(L, ArrayRef<BlockT *>(Backedges), this, DomTree);// 构造循环体，包括BBMap信息
     }
   }
   // Perform a single forward CFG traversal to populate block and subloop
   // vectors for all loops.
-  PopulateLoopsDFS<BlockT, LoopT> DFS(this);
+  PopulateLoopsDFS<BlockT, LoopT> DFS(this);//完善循环嵌套关系
   DFS.traverse(DomRoot->getBlock());
 }
 

@@ -104,7 +104,7 @@ void ModuleToFunctionPassAdaptor::printPipeline(
 PreservedAnalyses ModuleToFunctionPassAdaptor::run(Module &M,
                                                    ModuleAnalysisManager &AM) {
   FunctionAnalysisManager &FAM =
-      AM.getResult<FunctionAnalysisManagerModuleProxy>(M).getManager();
+      AM.getResult<FunctionAnalysisManagerModuleProxy>(M).getManager();//外层IR的am包含了内层IR的am的入口。
 
   // Request PassInstrumentation from analysis manager, will use it to run
   // instrumenting callbacks for the passes later.
@@ -118,6 +118,7 @@ PreservedAnalyses ModuleToFunctionPassAdaptor::run(Module &M,
     // Check the PassInstrumentation's BeforePass callbacks before running the
     // pass, skip its execution completely if asked to (callback returns
     // false).
+    // 假设A类中的方法调用了B类中的方法，那么回调函数就是A中写的，如果B方法执行结束需要B主动调用的A函数
     if (!PI.runBeforePass<Function>(*Pass, F))
       continue;
 

@@ -27,6 +27,7 @@ PassManager<Loop, LoopAnalysisManager, LoopStandardAnalysisResults &,
             LPMUpdater &>::run(Loop &L, LoopAnalysisManager &AM,
                                LoopStandardAnalysisResults &AR, LPMUpdater &U) {
   // Runs loop-nest passes only when the current loop is a top-level one.
+  // 按照嵌套循环的顺序跑pass记录结果
   PreservedAnalyses PA = (L.isOutermost() && !LoopNestPasses.empty())
                              ? runWithLoopNestPasses(L, AM, AR, U)
                              : runWithoutLoopNestPasses(L, AM, AR, U);
@@ -196,8 +197,8 @@ PreservedAnalyses FunctionToLoopPassAdaptor::run(Function &F,
   PreservedAnalyses PA = PreservedAnalyses::all();
   // Check the PassInstrumentation's BeforePass callbacks before running the
   // canonicalization pipeline.
-  if (PI.runBeforePass<Function>(LoopCanonicalizationFPM, F)) {
-    PA = LoopCanonicalizationFPM.run(F, AM);
+  if (PI.runBeforePass<Function>(LoopCanonicalizationFPM, F)) { // 检查PassINstrumentation的BeforePass callbacks
+    PA = LoopCanonicalizationFPM.run(F, AM); //callback被调用，才能运行这个pass
     PI.runAfterPass<Function>(LoopCanonicalizationFPM, F, PA);
   }
 
@@ -209,6 +210,7 @@ PreservedAnalyses FunctionToLoopPassAdaptor::run(Function &F,
     return PA;
 
   // Get the analysis results needed by loop passes.
+  // 从之前的规范化分析pipeline保存的分析结果中取出来
   MemorySSA *MSSA =
       UseMemorySSA ? (&AM.getResult<MemorySSAAnalysis>(F).getMSSA()) : nullptr;
   BlockFrequencyInfo *BFI = UseBlockFrequencyInfo && F.hasProfileData()

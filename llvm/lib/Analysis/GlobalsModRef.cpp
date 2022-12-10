@@ -268,8 +268,8 @@ GlobalsAAResult::getFunctionInfo(const Function *F) {
 void GlobalsAAResult::AnalyzeGlobals(Module &M) {
   SmallPtrSet<Function *, 32> TrackedFunctions;
   for (Function &F : M)
-    if (F.hasLocalLinkage()) {
-      if (!AnalyzeUsesOfPointer(&F)) {
+    if (F.hasLocalLinkage()) {  //internal|private
+      if (!AnalyzeUsesOfPointer(&F)) { // ！false,函数返回false代表该函数没有被复杂使用。
         // Remember that we are tracking this global.
         NonAddressTakenGlobals.insert(&F);
         TrackedFunctions.insert(&F);
@@ -277,12 +277,12 @@ void GlobalsAAResult::AnalyzeGlobals(Module &M) {
         Handles.front().I = Handles.begin();
         ++NumNonAddrTakenFunctions;
       } else
-        UnknownFunctionsWithLocalLinkage = true;
+        UnknownFunctionsWithLocalLinkage = true; // 有可能会改变全局变量的函数
     }
 
   SmallPtrSet<Function *, 16> Readers, Writers;
   for (GlobalVariable &GV : M.globals())
-    if (GV.hasLocalLinkage()) {
+    if (GV.hasLocalLinkage()) { 
       if (!AnalyzeUsesOfPointer(&GV, &Readers,
                                 GV.isConstant() ? nullptr : &Writers)) {
         // Remember that we are tracking this global, and the mod/ref fns
@@ -350,7 +350,7 @@ bool GlobalsAAResult::AnalyzeUsesOfPointer(Value *V,
                Operator::getOpcode(I) == Instruction::AddrSpaceCast) {
       if (AnalyzeUsesOfPointer(I, Readers, Writers, OkayStoreDest))
         return true;
-    } else if (auto *Call = dyn_cast<CallBase>(I)) {
+    } else if (auto *Call = dyn_cast<CallBase>(I)) { //说明当前传入参数value的一个使用是call value，也说明这个value是function
       // Make sure that this is just the function being called, not that it is
       // passing into the function.
       if (Call->isDataOperand(&U)) {
@@ -973,7 +973,7 @@ GlobalsAAResult::~GlobalsAAResult() = default;
   // Discover which functions aren't recursive, to feed into AnalyzeGlobals.
   Result.CollectSCCMembership(CG);
 
-  // Find non-addr taken globals.
+  // Find non-addr taken globals.找到没有在外部被作为指针（地址）使用的全局变量
   Result.AnalyzeGlobals(M);
 
   // Propagate on CG.

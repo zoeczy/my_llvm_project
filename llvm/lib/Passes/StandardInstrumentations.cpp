@@ -751,9 +751,9 @@ bool OptNoneInstrumentation::shouldRun(StringRef PassID, Any IR) {
   if (any_isa<const Function *>(IR)) {
     F = any_cast<const Function *>(IR);
   } else if (any_isa<const Loop *>(IR)) {
-    F = any_cast<const Loop *>(IR)->getHeader()->getParent();
+    F = any_cast<const Loop *>(IR)->getHeader()->getParent(); //获得该循环的header bb的parent函数，其实就是获得所在函数
   }
-  bool ShouldRun = !(F && F->hasOptNone());
+  bool ShouldRun = !(F && F->hasOptNone());//如果函数有optnone属性，则ir/codegen pass都不能优化，只能进行过程间优化。
   if (!ShouldRun && DebugLogging) {
     errs() << "Skipping pass " << PassID << " on " << F->getName()
            << " due to optnone attribute\n";
